@@ -1,0 +1,22 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c7ed6"/>
+      <stop offset="1" stop-color="#1864ab"/>
+    </linearGradient>
+  </defs>
+
+  <!-- fundo arredondado (cor por domínio: diagramas = azul, como o Slides) -->
+  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#bg)"/>
+
+  <!-- conector em L com ponta de seta (a assinatura do app: linhas que ligam formas) -->
+  <path d="M340 388 V612 H556" fill="none" stroke="#ffffff" stroke-width="34"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M556 566 l64 46 l-64 46 z" fill="#ffffff"/>
+
+  <!-- nó processo (retângulo) -->
+  <rect x="214" y="250" width="252" height="150" rx="30" fill="#ffffff"/>
+  <!-- nó decisão (losango) -->
+  <rect x="556" y="504" width="196" height="196" rx="26" fill="#ffffff"
+        transform="rotate(45 654 602)"/>
+</svg>

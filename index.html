@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LocalDraw</title>
+    <!-- OFFLINE: aponta as fontes do Excalidraw pro caminho local servido pelo
+         app (as fontes são copiadas pra /excalidraw-assets/fonts no build).
+         Precisa rodar ANTES do módulo do Excalidraw carregar, por isso é inline
+         aqui e não no main.tsx (imports ES são içados). -->
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = "/excalidraw-assets/";
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

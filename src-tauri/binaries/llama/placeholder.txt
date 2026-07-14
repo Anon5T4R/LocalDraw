@@ -1,0 +1,4 @@
+Este diretório recebe o runtime de IA (llama-server + libs) baixado por
+scripts/fetch-llama.{ps1,sh} durante o build no CI. Os binários NÃO são
+versionados; este placeholder existe só pra o glob de resources do Tauri
+("binaries/llama/*") nunca ficar vazio.

@@ -1,0 +1,250 @@
+:root {
+  --bar-bg: #f8f9fb;
+  --bar-fg: #1e2430;
+  --bar-border: #e2e6ee;
+  --btn-bg: #ffffff;
+  --btn-border: #d3d9e3;
+  --btn-hover: #eef1f6;
+  --accent: #1971c2;
+  --panel-bg: #ffffff;
+  --hint: #6b7280;
+  --error: #e03131;
+}
+
+.app[data-theme="dark"] {
+  --bar-bg: #1b1d22;
+  --bar-fg: #e6e8ec;
+  --bar-border: #2c2f36;
+  --btn-bg: #24262c;
+  --btn-border: #3a3d45;
+  --btn-hover: #2f323a;
+  --accent: #4dabf7;
+  --panel-bg: #202228;
+  --hint: #9aa0aa;
+  --error: #ff8787;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --- topbar --- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: var(--bar-bg);
+  color: var(--bar-fg);
+  border-bottom: 1px solid var(--bar-border);
+  flex: 0 0 auto;
+  user-select: none;
+}
+
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+.topbar .brand .logo {
+  color: var(--accent);
+  font-size: 18px;
+}
+.topbar .brand .title {
+  font-size: 14px;
+}
+
+.topbar .group {
+  display: flex;
+  gap: 4px;
+}
+.topbar .group.right {
+  margin-left: 0;
+}
+
+.topbar .filename {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 13px;
+  color: var(--hint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar button {
+  background: var(--btn-bg);
+  color: var(--bar-fg);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.topbar button:hover:not(:disabled) {
+  background: var(--btn-hover);
+}
+.topbar button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.topbar button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* --- canvas --- */
+.excal-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.excal-wrap .excalidraw {
+  height: 100%;
+}
+
+/* --- painel de IA --- */
+.ai-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 90vw;
+  background: var(--panel-bg);
+  color: var(--bar-fg);
+  border-left: 1px solid var(--bar-border);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  overflow-y: auto;
+}
+
+.ai-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bar-border);
+}
+.ai-head .icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--hint);
+}
+
+.ai-section {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--bar-border);
+}
+.ai-section h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--hint);
+}
+
+.ai-panel button {
+  background: var(--btn-bg);
+  color: var(--bar-fg);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.ai-panel button:hover:not(:disabled) {
+  background: var(--btn-hover);
+}
+.ai-panel button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-model-on {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.ai-gpu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin: 8px 0 0;
+  color: var(--hint);
+}
+
+.ai-models {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ai-models button {
+  width: 100%;
+  text-align: left;
+}
+
+.ai-section textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  padding: 8px;
+  font: inherit;
+  font-size: 13px;
+  background: var(--btn-bg);
+  color: var(--bar-fg);
+}
+
+.ai-generate {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600;
+}
+
+.ai-hint {
+  font-size: 12px;
+  color: var(--hint);
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+.ai-error {
+  font-size: 12px;
+  color: var(--error);
+  margin: 8px 0 0;
+  word-break: break-word;
+}
