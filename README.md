@@ -16,6 +16,9 @@ fluxograma a partir de uma descrição em português.
 - **Formato nativo `.tdraw`** — é o JSON padrão do Excalidraw, então um `.tdraw`
   também abre como `.excalidraw`. Abre por duplo-clique / "abrir com".
 - **Exportar** PNG e SVG.
+- **Menu 100% offline:** o menu do app tem só o que funciona sem internet (arquivo, exportar, buscar, limpar canvas) — sem os itens online/promo do Excalidraw web (colaboração, login, redes).
+- **Recuperação de sessão:** a cena é salva localmente enquanto você desenha; fechar sem salvar não perde nada — reabre onde parou.
+- **Biblioteca de formas** persistente entre sessões e importável (`.excalidrawlib`) offline.
 - **IA local (opcional, porta 8106):** descreva um processo → o modelo devolve os
   nós e ligações, e o LocalDraw desenha as formas e conectores. A IA **propõe**, o
   código valida e monta a geometria (nunca aplica coordenadas cruas do modelo).

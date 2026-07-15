@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Excalidraw,
+  MainMenu,
   exportToBlob,
   exportToSvg,
   getSceneVersion,
+  useHandleLibrary,
 } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type {
+  ExcalidrawImperativeAPI,
+  ExcalidrawInitialDataState,
+} from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
@@ -22,6 +27,23 @@ import { parseScene, serializeScene } from "./lib/tdraw";
 import TopBar, { type Theme } from "./components/TopBar";
 import AiPanel from "./components/AiPanel";
 import "./App.css";
+
+// Recuperação de sessão: o Excalidraw.com salva a cena no navegador pra não
+// perder trabalho ao recarregar; replicamos isso no localStorage do app. Assim
+// fechar sem salvar não perde o desenho — reabre onde parou.
+const AUTOSAVE_KEY = "localdraw:autosave:v1";
+
+function loadAutosave(): ExcalidrawInitialDataState | null {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || !Array.isArray(data.elements)) return null;
+    return { elements: data.elements, appState: data.appState ?? {}, files: data.files ?? {} };
+  } catch {
+    return null;
+  }
+}
 
 function baseName(path: string | null): string {
   if (!path) return "Sem título";
@@ -53,9 +75,16 @@ export default function App() {
 
   const savedVersion = useRef(0);
   const dirtyRef = useRef(false);
-  const filePathRef = useRef<string | null>(null);
+  const autosaveTimer = useRef<number | undefined>(undefined);
   dirtyRef.current = dirty;
-  filePathRef.current = filePath;
+
+  // Biblioteca de formas persistente (IndexedDB) + importar `.excalidrawlib`
+  // arrastando pro canvas — tudo local.
+  useHandleLibrary({ excalidrawAPI: api });
+
+  // Restaura a última cena (autosave) no 1º mount. Um arquivo aberto por
+  // "abrir com" sobrescreve isso depois.
+  const initialData = useMemo(() => loadAutosave(), []);
 
   const canFiles = inTauri();
   const resolvedTheme: "light" | "dark" =
@@ -77,14 +106,39 @@ export default function App() {
     document.title = title;
   }, [filePath, dirty, canFiles]);
 
+  // A cena inicial (autosave restaurado ou vazia) é a linha de base "salva" —
+  // pra não abrir marcado como sujo. Ancoramos no próprio initialData (e não em
+  // getSceneElements) pra evitar a corrida com o restore assíncrono do Excalidraw.
+  useEffect(() => {
+    if (!api) return;
+    const base = (initialData?.elements ?? []) as readonly ExcalidrawElement[];
+    savedVersion.current = getSceneVersion(base);
+    setDirty(false);
+  }, [api, initialData]);
+
   const markSaved = useCallback((elements: readonly ExcalidrawElement[]) => {
     savedVersion.current = getSceneVersion(elements);
     setDirty(false);
   }, []);
 
-  const onChange = useCallback((elements: readonly ExcalidrawElement[]) => {
-    setDirty(getSceneVersion(elements) !== savedVersion.current);
-  }, []);
+  const onChange = useCallback(
+    (elements: readonly ExcalidrawElement[], appState: unknown, files: unknown) => {
+      setDirty(getSceneVersion(elements) !== savedVersion.current);
+      // Autosave debounced pro localStorage (recuperação de sessão).
+      window.clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = window.setTimeout(() => {
+        try {
+          localStorage.setItem(
+            AUTOSAVE_KEY,
+            serializeScene(elements, appState as never, files as never),
+          );
+        } catch {
+          /* localStorage cheio/indisponível — ignora */
+        }
+      }, 700);
+    },
+    [],
+  );
 
   const confirmDiscard = useCallback(() => {
     if (!dirtyRef.current) return true;
@@ -292,10 +346,28 @@ export default function App() {
       <div className="excal-wrap">
         <Excalidraw
           excalidrawAPI={(a) => setApi(a)}
+          initialData={initialData}
           onChange={onChange}
           theme={resolvedTheme}
           langCode="pt-BR"
-        />
+        >
+          {/* Menu próprio: só itens offline. Remove os promos/online do padrão
+              (Excalidraw+, redes sociais, colaboração ao vivo, login) e liga
+              os comandos de arquivo nativos do LocalDraw. */}
+          <MainMenu>
+            <MainMenu.Item onSelect={newScene}>Novo</MainMenu.Item>
+            <MainMenu.Item onSelect={openViaDialog}>Abrir…</MainMenu.Item>
+            <MainMenu.Item onSelect={save}>Salvar</MainMenu.Item>
+            <MainMenu.Item onSelect={saveAs}>Salvar como…</MainMenu.Item>
+            <MainMenu.Separator />
+            <MainMenu.Item onSelect={exportPng}>Exportar PNG</MainMenu.Item>
+            <MainMenu.Item onSelect={exportSvg}>Exportar SVG</MainMenu.Item>
+            <MainMenu.Separator />
+            <MainMenu.DefaultItems.SearchMenu />
+            <MainMenu.DefaultItems.ChangeCanvasBackground />
+            <MainMenu.DefaultItems.ClearCanvas />
+          </MainMenu>
+        </Excalidraw>
       </div>
       <AiPanel open={aiOpen} onClose={() => setAiOpen(false)} onInsert={insertElements} />
     </div>
