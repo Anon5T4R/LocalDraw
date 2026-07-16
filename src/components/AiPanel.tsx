@@ -5,6 +5,7 @@ import { useAi } from "../state/airuntime";
 import { inTauri } from "../lib/backend";
 import { generateDiagram } from "../lib/ai";
 import { buildDiagramElements } from "../lib/diagramBuild";
+import { t } from "../lib/i18n";
 
 interface Props {
   open: boolean;
@@ -16,8 +17,6 @@ function short(path: string): string {
   const parts = path.split(/[\\/]/);
   return parts[parts.length - 1] || path;
 }
-
-const EXAMPLE = "Processo de aprovação de férias: colaborador solicita, gestor avalia, RH registra.";
 
 export default function AiPanel({ open, onClose, onInsert }: Props) {
   const ai = useAi();
@@ -55,33 +54,33 @@ export default function AiPanel({ open, onClose, onInsert }: Props) {
   return (
     <aside className="ai-panel">
       <div className="ai-head">
-        <strong>✨ Gerar com IA</strong>
-        <button className="icon" onClick={onClose} title="Fechar">
+        <strong>{t("ai.head")}</strong>
+        <button className="icon" onClick={onClose} title={t("ai.closeTitle")}>
           ✕
         </button>
       </div>
 
       {!inTauri() ? (
-        <p className="ai-hint">A IA local só funciona no app instalado (fora do navegador de dev).</p>
+        <p className="ai-hint">{t("ai.devOnly")}</p>
       ) : (
         <>
           <section className="ai-section">
-            <h4>Modelo (GGUF)</h4>
+            <h4>{t("ai.modelH")}</h4>
             {ai.port ? (
               <div className="ai-model-on">
                 <span title={ai.model}>🟢 {short(ai.model)}</span>
-                <button onClick={() => ai.stop()}>Parar</button>
+                <button onClick={() => ai.stop()}>{t("ai.stop")}</button>
               </div>
             ) : (
               <>
-                <button onClick={chooseFolder}>Escolher pasta de modelos…</button>
+                <button onClick={chooseFolder}>{t("ai.chooseFolder")}</button>
                 <label className="ai-gpu">
                   <input
                     type="checkbox"
                     checked={useGpu}
                     onChange={(e) => setUseGpu(e.target.checked)}
                   />
-                  Usar GPU (offload)
+                  {t("ai.gpu")}
                 </label>
                 {ai.models.length > 0 && (
                   <ul className="ai-models">
@@ -98,17 +97,17 @@ export default function AiPanel({ open, onClose, onInsert }: Props) {
                     ))}
                   </ul>
                 )}
-                {ai.starting && <p className="ai-hint">Iniciando o modelo…</p>}
+                {ai.starting && <p className="ai-hint">{t("ai.starting")}</p>}
                 {ai.error && <p className="ai-error">{ai.error}</p>}
               </>
             )}
           </section>
 
           <section className="ai-section">
-            <h4>Descreva o fluxograma</h4>
+            <h4>{t("ai.describeH")}</h4>
             <textarea
               value={prompt}
-              placeholder={EXAMPLE}
+              placeholder={t("ai.example")}
               rows={5}
               disabled={!ai.port || generating}
               onChange={(e) => setPrompt(e.target.value)}
@@ -118,14 +117,11 @@ export default function AiPanel({ open, onClose, onInsert }: Props) {
               disabled={!ai.port || generating || !prompt.trim()}
               onClick={generate}
             >
-              {generating ? "Gerando…" : "Gerar fluxograma"}
+              {generating ? t("ai.generating") : t("ai.generate")}
             </button>
-            {!ai.port && <p className="ai-hint">Carregue um modelo acima para habilitar.</p>}
+            {!ai.port && <p className="ai-hint">{t("ai.loadHint")}</p>}
             {genError && <p className="ai-error">{genError}</p>}
-            <p className="ai-hint">
-              A IA propõe os nós e ligações; o LocalDraw desenha as formas e conectores. Você edita
-              tudo no canvas depois.
-            </p>
+            <p className="ai-hint">{t("ai.explain")}</p>
           </section>
         </>
       )}

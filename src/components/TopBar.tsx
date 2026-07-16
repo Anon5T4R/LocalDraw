@@ -1,3 +1,5 @@
+import { LOCALE_LABELS, setLocale, t, useLocale, type Locale } from "../lib/i18n";
+
 export type Theme = "light" | "dark" | "system";
 
 interface Props {
@@ -17,9 +19,14 @@ interface Props {
 }
 
 const THEME_ICON: Record<Theme, string> = { light: "☀️", dark: "🌙", system: "🖥️" };
-const THEME_LABEL: Record<Theme, string> = { light: "Tema: claro", dark: "Tema: escuro", system: "Tema: sistema" };
+const THEME_LABEL_KEY: Record<Theme, "theme.light" | "theme.dark" | "theme.system"> = {
+  light: "theme.light",
+  dark: "theme.dark",
+  system: "theme.system",
+};
 
 export default function TopBar(p: Props) {
+  const locale = useLocale();
   return (
     <header className="topbar">
       <div className="brand">
@@ -28,19 +35,19 @@ export default function TopBar(p: Props) {
       </div>
 
       <div className="group">
-        <button onClick={p.onNew} title="Novo (Ctrl+N)">Novo</button>
-        <button onClick={p.onOpen} disabled={!p.canFiles} title="Abrir (Ctrl+O)">Abrir</button>
-        <button onClick={p.onSave} disabled={!p.canFiles} title="Salvar (Ctrl+S)">Salvar</button>
-        <button onClick={p.onSaveAs} disabled={!p.canFiles} title="Salvar como (Ctrl+Shift+S)">
-          Salvar como
+        <button onClick={p.onNew} title={t("topbar.newTitle")}>{t("topbar.new")}</button>
+        <button onClick={p.onOpen} disabled={!p.canFiles} title={t("topbar.openTitle")}>{t("topbar.open")}</button>
+        <button onClick={p.onSave} disabled={!p.canFiles} title={t("topbar.saveTitle")}>{t("topbar.save")}</button>
+        <button onClick={p.onSaveAs} disabled={!p.canFiles} title={t("topbar.saveAsTitle")}>
+          {t("topbar.saveAs")}
         </button>
       </div>
 
       <div className="group">
-        <button onClick={p.onExportPng} disabled={!p.canFiles} title="Exportar imagem PNG">
+        <button onClick={p.onExportPng} disabled={!p.canFiles} title={t("topbar.pngTitle")}>
           PNG
         </button>
-        <button onClick={p.onExportSvg} disabled={!p.canFiles} title="Exportar vetor SVG">
+        <button onClick={p.onExportSvg} disabled={!p.canFiles} title={t("topbar.svgTitle")}>
           SVG
         </button>
       </div>
@@ -54,11 +61,24 @@ export default function TopBar(p: Props) {
         <button
           className={p.aiOpen ? "active" : ""}
           onClick={p.onToggleAi}
-          title="Gerar fluxograma com IA"
+          title={t("topbar.aiTitle")}
         >
-          ✨ IA
+          {t("topbar.ai")}
         </button>
-        <button onClick={p.onCycleTheme} title={THEME_LABEL[p.theme]}>
+        <select
+          className="lang-select"
+          value={locale}
+          onChange={(e) => setLocale(e.target.value as Locale)}
+          title={t("lang.title")}
+          aria-label={t("lang.title")}
+        >
+          {(Object.keys(LOCALE_LABELS) as Locale[]).map((l) => (
+            <option key={l} value={l}>
+              {LOCALE_LABELS[l]}
+            </option>
+          ))}
+        </select>
+        <button onClick={p.onCycleTheme} title={t(THEME_LABEL_KEY[p.theme])}>
           {THEME_ICON[p.theme]}
         </button>
       </div>

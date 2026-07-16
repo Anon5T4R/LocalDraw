@@ -112,6 +112,16 @@ body {
   border-color: var(--accent);
   color: var(--accent);
 }
+.topbar .lang-select {
+  background: var(--btn-bg);
+  color: var(--bar-fg);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  padding: 5px 6px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1.2;
+}
 
 /* --- canvas --- */
 .excal-wrap {

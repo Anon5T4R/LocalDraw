@@ -24,6 +24,7 @@ import {
   writeTextFile,
 } from "./lib/backend";
 import { parseScene, serializeScene } from "./lib/tdraw";
+import { EXCAL_LANG, getLocale, t } from "./lib/i18n";
 import TopBar, { type Theme } from "./components/TopBar";
 import AiPanel from "./components/AiPanel";
 import "./App.css";
@@ -46,7 +47,7 @@ function loadAutosave(): ExcalidrawInitialDataState | null {
 }
 
 function baseName(path: string | null): string {
-  if (!path) return "Sem título";
+  if (!path) return t("file.untitled");
   const parts = path.split(/[\\/]/);
   return parts[parts.length - 1] || path;
 }
@@ -142,7 +143,7 @@ export default function App() {
 
   const confirmDiscard = useCallback(() => {
     if (!dirtyRef.current) return true;
-    return window.confirm("Há alterações não salvas. Descartar?");
+    return window.confirm(t("confirm.discard"));
   }, []);
 
   const openPath = useCallback(
@@ -158,7 +159,7 @@ export default function App() {
         setFilePath(path);
         markSaved(scene.elements);
       } catch (e) {
-        window.alert(`Não foi possível abrir o arquivo:\n${e}`);
+        window.alert(t("alert.openFail", { e: String(e) }));
       }
     },
     [api, markSaved],
@@ -175,7 +176,7 @@ export default function App() {
     if (!api || !confirmDiscard()) return;
     const selected = await openDialog({
       multiple: false,
-      filters: [{ name: "Diagrama", extensions: ["tdraw", "excalidraw"] }],
+      filters: [{ name: t("dialog.diagram"), extensions: ["tdraw", "excalidraw"] }],
     });
     if (typeof selected === "string") await openPath(selected);
   }, [api, confirmDiscard, openPath]);
@@ -191,7 +192,7 @@ export default function App() {
         markSaved(elements);
         return true;
       } catch (e) {
-        window.alert(`Falha ao salvar:\n${e}`);
+        window.alert(t("alert.saveFail", { e: String(e) }));
         return false;
       }
     },
@@ -201,7 +202,7 @@ export default function App() {
   const saveAs = useCallback(async () => {
     const path = await saveDialog({
       defaultPath: filePath ?? "diagrama.tdraw",
-      filters: [{ name: "Diagrama LocalDraw", extensions: ["tdraw"] }],
+      filters: [{ name: t("dialog.diagramSave"), extensions: ["tdraw"] }],
     });
     if (path) await doSave(path);
   }, [filePath, doSave]);
@@ -215,7 +216,7 @@ export default function App() {
     if (!api) return;
     const path = await saveDialog({
       defaultPath: `${baseName(filePath).replace(/\.tdraw$/i, "")}.png`,
-      filters: [{ name: "Imagem PNG", extensions: ["png"] }],
+      filters: [{ name: t("dialog.png"), extensions: ["png"] }],
     });
     if (!path) return;
     try {
@@ -227,7 +228,7 @@ export default function App() {
       });
       await writeFileBase64(path, base64FromArrayBuffer(await blob.arrayBuffer()));
     } catch (e) {
-      window.alert(`Falha ao exportar PNG:\n${e}`);
+      window.alert(t("alert.pngFail", { e: String(e) }));
     }
   }, [api, filePath]);
 
@@ -235,7 +236,7 @@ export default function App() {
     if (!api) return;
     const path = await saveDialog({
       defaultPath: `${baseName(filePath).replace(/\.tdraw$/i, "")}.svg`,
-      filters: [{ name: "Imagem SVG", extensions: ["svg"] }],
+      filters: [{ name: t("dialog.svg"), extensions: ["svg"] }],
     });
     if (!path) return;
     try {
@@ -246,7 +247,7 @@ export default function App() {
       });
       await writeTextFile(path, new XMLSerializer().serializeToString(svg));
     } catch (e) {
-      window.alert(`Falha ao exportar SVG:\n${e}`);
+      window.alert(t("alert.svgFail", { e: String(e) }));
     }
   }, [api, filePath]);
 
@@ -296,7 +297,7 @@ export default function App() {
     let unlisten: (() => void) | undefined;
     (async () => {
       unlisten = await getCurrentWindow().onCloseRequested((e) => {
-        if (dirtyRef.current && !window.confirm("Há alterações não salvas. Sair mesmo assim?")) {
+        if (dirtyRef.current && !window.confirm(t("confirm.exit"))) {
           e.preventDefault();
         }
       });
@@ -349,19 +350,19 @@ export default function App() {
           initialData={initialData}
           onChange={onChange}
           theme={resolvedTheme}
-          langCode="pt-BR"
+          langCode={EXCAL_LANG[getLocale()]}
         >
           {/* Menu próprio: só itens offline. Remove os promos/online do padrão
               (Excalidraw+, redes sociais, colaboração ao vivo, login) e liga
               os comandos de arquivo nativos do LocalDraw. */}
           <MainMenu>
-            <MainMenu.Item onSelect={newScene}>Novo</MainMenu.Item>
-            <MainMenu.Item onSelect={openViaDialog}>Abrir…</MainMenu.Item>
-            <MainMenu.Item onSelect={save}>Salvar</MainMenu.Item>
-            <MainMenu.Item onSelect={saveAs}>Salvar como…</MainMenu.Item>
+            <MainMenu.Item onSelect={newScene}>{t("menu.new")}</MainMenu.Item>
+            <MainMenu.Item onSelect={openViaDialog}>{t("menu.open")}</MainMenu.Item>
+            <MainMenu.Item onSelect={save}>{t("menu.save")}</MainMenu.Item>
+            <MainMenu.Item onSelect={saveAs}>{t("menu.saveAs")}</MainMenu.Item>
             <MainMenu.Separator />
-            <MainMenu.Item onSelect={exportPng}>Exportar PNG</MainMenu.Item>
-            <MainMenu.Item onSelect={exportSvg}>Exportar SVG</MainMenu.Item>
+            <MainMenu.Item onSelect={exportPng}>{t("menu.exportPng")}</MainMenu.Item>
+            <MainMenu.Item onSelect={exportSvg}>{t("menu.exportSvg")}</MainMenu.Item>
             <MainMenu.Separator />
             <MainMenu.DefaultItems.SearchMenu />
             <MainMenu.DefaultItems.ChangeCanvasBackground />
