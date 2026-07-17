@@ -24,6 +24,73 @@
   --error: #ff8787;
 }
 
+/* Temas nomeados (paletas fixas). O chrome usa a paleta inteira; o canvas do
+   Excalidraw só entende light/dark — o mapeamento fica no App.tsx. */
+.app[data-theme="nature"] {
+  --bar-bg: #eef2ea;
+  --bar-fg: #2e3a2e;
+  --bar-border: #e2e8dd;
+  --btn-bg: #ffffff;
+  --btn-border: #e2e8dd;
+  --btn-hover: #e6efe1;
+  --accent: #7a9e7e;
+  --panel-bg: #ffffff;
+  --hint: #6f7d6f;
+  --error: #c0492f;
+}
+
+.app[data-theme="darkblue"] {
+  --bar-bg: #131f30;
+  --bar-fg: #e2e8f0;
+  --bar-border: #223049;
+  --btn-bg: #1a2942;
+  --btn-border: #223049;
+  --btn-hover: #1e3a5f;
+  --accent: #3b82f6;
+  --panel-bg: #131f30;
+  --hint: #8595ad;
+  --error: #f87171;
+}
+
+.app[data-theme="calmgreen"] {
+  --bar-bg: #e9efe7;
+  --bar-fg: #24302a;
+  --bar-border: #dde6dc;
+  --btn-bg: #ffffff;
+  --btn-border: #dde6dc;
+  --btn-hover: #dcebd9;
+  --accent: #4f7d5e;
+  --panel-bg: #ffffff;
+  --hint: #6a7a6f;
+  --error: #c0492f;
+}
+
+.app[data-theme="pastelpink"] {
+  --bar-bg: #f9eaf0;
+  --bar-fg: #3a2a30;
+  --bar-border: #f2dfe7;
+  --btn-bg: #ffffff;
+  --btn-border: #f2dfe7;
+  --btn-hover: #fbe4ee;
+  --accent: #e8799f;
+  --panel-bg: #ffffff;
+  --hint: #8a7580;
+  --error: #d84a6b;
+}
+
+.app[data-theme="punkprincess"] {
+  --bar-bg: #1a0f26;
+  --bar-fg: #f0e6ff;
+  --bar-border: #2c1c3d;
+  --btn-bg: #241533;
+  --btn-border: #2c1c3d;
+  --btn-hover: #33143a;
+  --accent: #ff2d95;
+  --panel-bg: #1a0f26;
+  --hint: #9a86b5;
+  --error: #ff5470;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -112,7 +179,8 @@ body {
   border-color: var(--accent);
   color: var(--accent);
 }
-.topbar .lang-select {
+.topbar .lang-select,
+.topbar .theme-select {
   background: var(--btn-bg);
   color: var(--bar-fg);
   border: 1px solid var(--btn-border);

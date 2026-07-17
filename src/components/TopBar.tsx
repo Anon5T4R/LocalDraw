@@ -1,6 +1,32 @@
-import { LOCALE_LABELS, setLocale, t, useLocale, type Locale } from "../lib/i18n";
+import {
+  LOCALE_LABELS,
+  setLocale,
+  t,
+  useLocale,
+  type Locale,
+  type MessageKey,
+} from "../lib/i18n";
 
-export type Theme = "light" | "dark" | "system";
+export type Theme =
+  | "light"
+  | "dark"
+  | "system"
+  | "nature"
+  | "darkblue"
+  | "calmgreen"
+  | "pastelpink"
+  | "punkprincess";
+
+export const THEMES: Theme[] = [
+  "system",
+  "light",
+  "dark",
+  "nature",
+  "darkblue",
+  "calmgreen",
+  "pastelpink",
+  "punkprincess",
+];
 
 interface Props {
   fileName: string;
@@ -14,15 +40,29 @@ interface Props {
   onSaveAs: () => void;
   onExportPng: () => void;
   onExportSvg: () => void;
-  onCycleTheme: () => void;
+  onSetTheme: (theme: Theme) => void;
   onToggleAi: () => void;
 }
 
-const THEME_ICON: Record<Theme, string> = { light: "☀️", dark: "🌙", system: "🖥️" };
-const THEME_LABEL_KEY: Record<Theme, "theme.light" | "theme.dark" | "theme.system"> = {
+const THEME_ICON: Record<Theme, string> = {
+  light: "☀️",
+  dark: "🌙",
+  system: "🖥️",
+  nature: "🌿",
+  darkblue: "🌊",
+  calmgreen: "🍃",
+  pastelpink: "🌸",
+  punkprincess: "💜",
+};
+const THEME_LABEL_KEY: Record<Theme, MessageKey> = {
   light: "theme.light",
   dark: "theme.dark",
   system: "theme.system",
+  nature: "theme.nature",
+  darkblue: "theme.darkblue",
+  calmgreen: "theme.calmgreen",
+  pastelpink: "theme.pastelpink",
+  punkprincess: "theme.punkprincess",
 };
 
 export default function TopBar(p: Props) {
@@ -78,9 +118,19 @@ export default function TopBar(p: Props) {
             </option>
           ))}
         </select>
-        <button onClick={p.onCycleTheme} title={t(THEME_LABEL_KEY[p.theme])}>
-          {THEME_ICON[p.theme]}
-        </button>
+        <select
+          className="theme-select"
+          value={p.theme}
+          onChange={(e) => p.onSetTheme(e.target.value as Theme)}
+          title={t("theme.title")}
+          aria-label={t("theme.title")}
+        >
+          {THEMES.map((th) => (
+            <option key={th} value={th}>
+              {THEME_ICON[th]} {t(THEME_LABEL_KEY[th])}
+            </option>
+          ))}
+        </select>
       </div>
     </header>
   );

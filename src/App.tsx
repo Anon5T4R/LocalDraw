@@ -25,7 +25,7 @@ import {
 } from "./lib/backend";
 import { parseScene, serializeScene } from "./lib/tdraw";
 import { EXCAL_LANG, getLocale, t } from "./lib/i18n";
-import TopBar, { type Theme } from "./components/TopBar";
+import TopBar, { type Theme, THEMES } from "./components/TopBar";
 import AiPanel from "./components/AiPanel";
 import "./App.css";
 
@@ -33,6 +33,25 @@ import "./App.css";
 // perder trabalho ao recarregar; replicamos isso no localStorage do app. Assim
 // fechar sem salvar não perde o desenho — reabre onde parou.
 const AUTOSAVE_KEY = "localdraw:autosave:v1";
+
+const THEME_KEY = "localdraw.theme";
+
+function loadTheme(): Theme {
+  try {
+    const v = localStorage.getItem(THEME_KEY);
+    return v && (THEMES as string[]).includes(v) ? (v as Theme) : "system";
+  } catch {
+    return "system";
+  }
+}
+
+function saveTheme(theme: Theme) {
+  try {
+    localStorage.setItem(THEME_KEY, theme);
+  } catch {
+    /* localStorage cheio/indisponível — ignora */
+  }
+}
 
 function loadAutosave(): ExcalidrawInitialDataState | null {
   try {
@@ -62,6 +81,17 @@ function base64FromArrayBuffer(buf: ArrayBuffer): string {
   return btoa(binary);
 }
 
+// O canvas do Excalidraw só tem tema claro/escuro — os temas nomeados são só do
+// chrome. Mapeia cada nomeado pro lado certo pra o canvas nunca ficar claro sob
+// um chrome escuro (e vice-versa).
+const NAMED_CANVAS: Record<string, "light" | "dark"> = {
+  nature: "light",
+  calmgreen: "light",
+  pastelpink: "light",
+  darkblue: "dark",
+  punkprincess: "dark",
+};
+
 function prefersDark(): boolean {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 }
@@ -70,7 +100,7 @@ export default function App() {
   const [api, setApi] = useState<ExcalidrawImperativeAPI | null>(null);
   const [filePath, setFilePath] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useState<Theme>(loadTheme);
   const [systemDark, setSystemDark] = useState(prefersDark());
   const [aiOpen, setAiOpen] = useState(false);
 
@@ -88,8 +118,16 @@ export default function App() {
   const initialData = useMemo(() => loadAutosave(), []);
 
   const canFiles = inTauri();
-  const resolvedTheme: "light" | "dark" =
-    theme === "system" ? (systemDark ? "dark" : "light") : theme;
+  const canvasTheme: "light" | "dark" =
+    theme === "system"
+      ? systemDark
+        ? "dark"
+        : "light"
+      : theme === "light" || theme === "dark"
+        ? theme
+        : NAMED_CANVAS[theme];
+  // `data-theme` do chrome: o nomeado passa direto; "system" resolve p/ claro/escuro.
+  const chromeTheme = theme === "system" ? canvasTheme : theme;
 
   // Acompanha o tema do sistema quando em "system".
   useEffect(() => {
@@ -326,7 +364,7 @@ export default function App() {
   }, [save, saveAs, openViaDialog, newScene]);
 
   return (
-    <div className="app" data-theme={resolvedTheme}>
+    <div className="app" data-theme={chromeTheme}>
       <TopBar
         fileName={baseName(filePath)}
         dirty={dirty}
@@ -339,9 +377,10 @@ export default function App() {
         onSaveAs={saveAs}
         onExportPng={exportPng}
         onExportSvg={exportSvg}
-        onCycleTheme={() =>
-          setTheme((t) => (t === "system" ? "light" : t === "light" ? "dark" : "system"))
-        }
+        onSetTheme={(th) => {
+          setTheme(th);
+          saveTheme(th);
+        }}
         onToggleAi={() => setAiOpen((v) => !v)}
       />
       <div className="excal-wrap">
@@ -349,7 +388,7 @@ export default function App() {
           excalidrawAPI={(a) => setApi(a)}
           initialData={initialData}
           onChange={onChange}
-          theme={resolvedTheme}
+          theme={canvasTheme}
           langCode={EXCAL_LANG[getLocale()]}
         >
           {/* Menu próprio: só itens offline. Remove os promos/online do padrão
