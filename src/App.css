@@ -1,92 +1,106 @@
+/* Pass de suavização dos fundos: o chrome não pode ser o pico de contraste da
+   tela — quem tem que puxar o olho é o `--accent`. Por isso nenhuma superfície
+   é branco puro (as barras/botões descem ~3 L*) e no escuro tudo sobe ~5 L*
+   pra sair do quase-preto. Só L* muda: o matiz de cada tema fica intacto. */
 :root {
-  --bar-bg: #f8f9fb;
+  --bar-bg: #eff0f2;
   --bar-fg: #1e2430;
-  --bar-border: #e2e6ee;
-  --btn-bg: #ffffff;
-  --btn-border: #d3d9e3;
-  --btn-hover: #eef1f6;
+  --bar-border: #dadee5;
+  /* era #ffffff: branco puro não sobrevive à pass; off-white no matiz da barra */
+  --btn-bg: #f7f8fa;
+  --btn-border: #cbd1db;
+  --btn-hover: #e5e8ed;
   --accent: #1971c2;
-  --panel-bg: #ffffff;
-  --hint: #6b7280;
+  --panel-bg: #f7f8fa;
+  /* o --hint mora na .topbar (fundo --bar-bg, a superfície mais ESCURA do
+     chrome) e no .ai-panel; aferido contra o pior caso, o bar-bg. */
+  --hint: #666d7b;
   --error: #e03131;
 }
 
 .app[data-theme="dark"] {
-  --bar-bg: #1b1d22;
+  --bar-bg: #25272c;
   --bar-fg: #e6e8ec;
-  --bar-border: #2c2f36;
-  --btn-bg: #24262c;
-  --btn-border: #3a3d45;
-  --btn-hover: #2f323a;
+  --bar-border: #373a41;
+  --btn-bg: #2f3137;
+  --btn-border: #454851;
+  --btn-hover: #3a3d45;
   --accent: #4dabf7;
-  --panel-bg: #202228;
+  --panel-bg: #2a2c33;
   --hint: #9aa0aa;
   --error: #ff8787;
 }
 
 /* Temas nomeados (paletas fixas). O chrome usa a paleta inteira; o canvas do
-   Excalidraw só entende light/dark — o mapeamento fica no App.tsx. */
+   Excalidraw só entende light/dark — o mapeamento fica no App.tsx.
+   Papel → var da suíte: `--bar-bg`/`--panel-bg` são superfície (o `--panel` ou
+   `--panel-2` da paleta padrão, dependendo do tema), `--btn-bg` é a superfície
+   do controle, `--btn-hover` a secundária. Cada var recebe o sucessor exato do
+   valor que tinha na paleta da suíte, então a escada de luminância é a mesma. */
 .app[data-theme="nature"] {
-  --bar-bg: #eef2ea;
+  --bar-bg: #e4eade;
   --bar-fg: #2e3a2e;
-  --bar-border: #e2e8dd;
-  --btn-bg: #ffffff;
-  --btn-border: #e2e8dd;
-  --btn-hover: #e6efe1;
+  --bar-border: #dbe3d4;
+  --btn-bg: #f8faf5;
+  --btn-border: #dbe3d4;
+  --btn-hover: #dde6d8;
   --accent: #7a9e7e;
-  --panel-bg: #ffffff;
-  --hint: #6f7d6f;
+  --panel-bg: #f8faf5;
+  /* Secundário escurecido pra cravar 4.5:1 (matiz mantido). Vai além da
+     referência da suíte (#697669) porque aqui o --hint mora no --bar-bg, que
+     no Draw é o panel-2 (mais escuro que o panel onde os outros apps o medem). */
+  --hint: #5f6c5f;
   --error: #c0492f;
 }
 
 .app[data-theme="darkblue"] {
-  --bar-bg: #131f30;
+  --bar-bg: #1d2a3c;
   --bar-fg: #e2e8f0;
-  --bar-border: #223049;
-  --btn-bg: #1a2942;
-  --btn-border: #223049;
-  --btn-hover: #1e3a5f;
+  --bar-border: #2d3f59;
+  --btn-bg: #26374e;
+  --btn-border: #2d3f59;
+  --btn-hover: #2e486e;
   --accent: #3b82f6;
-  --panel-bg: #131f30;
+  --panel-bg: #1d2a3c;
   --hint: #8595ad;
   --error: #f87171;
 }
 
 .app[data-theme="calmgreen"] {
-  --bar-bg: #e9efe7;
+  --bar-bg: #dfe8dd;
   --bar-fg: #24302a;
-  --bar-border: #dde6dc;
-  --btn-bg: #ffffff;
-  --btn-border: #dde6dc;
-  --btn-hover: #dcebd9;
+  --bar-border: #d5e0d3;
+  --btn-bg: #f7faf6;
+  --btn-border: #d5e0d3;
+  --btn-hover: #d4e3d1;
   --accent: #4f7d5e;
-  --panel-bg: #ffffff;
-  --hint: #6a7a6f;
+  --panel-bg: #f7faf6;
+  --hint: #5a6a5f;
   --error: #c0492f;
 }
 
 .app[data-theme="pastelpink"] {
-  --bar-bg: #f9eaf0;
+  --bar-bg: #f2dde6;
   --bar-fg: #3a2a30;
-  --bar-border: #f2dfe7;
-  --btn-bg: #ffffff;
-  --btn-border: #f2dfe7;
-  --btn-hover: #fbe4ee;
+  --bar-border: #ecd3de;
+  --btn-bg: #fdf6f9;
+  --btn-border: #ecd3de;
+  --btn-hover: #efd9e3;
   --accent: #e8799f;
-  --panel-bg: #ffffff;
-  --hint: #8a7580;
+  --panel-bg: #fdf6f9;
+  --hint: #73606a;
   --error: #d84a6b;
 }
 
 .app[data-theme="punkprincess"] {
-  --bar-bg: #1a0f26;
+  --bar-bg: #251733;
   --bar-fg: #f0e6ff;
-  --bar-border: #2c1c3d;
-  --btn-bg: #241533;
-  --btn-border: #2c1c3d;
-  --btn-hover: #33143a;
+  --bar-border: #3a2850;
+  --btn-bg: #32204a;
+  --btn-border: #3a2850;
+  --btn-hover: #422249;
   --accent: #ff2d95;
-  --panel-bg: #1a0f26;
+  --panel-bg: #251733;
   --hint: #9a86b5;
   --error: #ff5470;
 }
