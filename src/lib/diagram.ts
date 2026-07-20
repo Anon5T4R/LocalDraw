@@ -6,6 +6,8 @@
 // Este módulo é PURO (sem importar o Excalidraw) pra rodar leve no vitest. A
 // conversão final pra elementos vive em `diagramBuild.ts`.
 
+import { routeConnector, type Point, type Rect } from "./route";
+
 export type NodeType =
   | "process"
   | "decision"
@@ -199,39 +201,89 @@ export interface Skel {
   strokeColor?: string;
   start?: { id: string };
   end?: { id: string };
+  /** Pontos da seta, RELATIVOS a x/y (contrato do Excalidraw). */
+  points?: [number, number][];
 }
 
-/** DiagramSpec + posições → lista de skeletons (containers + setas vinculadas). */
-export function specToSkeleton(spec: DiagramSpec, pos: Map<string, Pos>): Skel[] {
-  const out: Skel[] = [];
+/** Retângulo de cada nó no layout — base do roteamento dos conectores. */
+export function nodeRects(spec: DiagramSpec, pos: Map<string, Pos>): Map<string, Rect> {
+  const rects = new Map<string, Rect>();
   for (const n of spec.nodes) {
     const p = pos.get(n.id);
     if (!p) continue;
     const s = styleFor(n.type);
+    rects.set(n.id, {
+      x: Math.round(p.cx - s.width / 2),
+      y: Math.round(p.cy - s.height / 2),
+      w: s.width,
+      h: s.height,
+    });
+  }
+  return rects;
+}
+
+/**
+ * DiagramSpec + posições → skeletons (containers + setas roteadas).
+ *
+ * Cada seta ganha uma polilinha ortogonal que sai/entra pelas BORDAS e desvia
+ * das outras formas (ver `route.ts`) — antes eram retas centro-a-centro, que
+ * atravessavam qualquer nó no caminho. O vínculo start/end continua, pra a seta
+ * seguir a forma quando o usuário arrasta.
+ */
+export function specToSkeleton(spec: DiagramSpec, pos: Map<string, Pos>): Skel[] {
+  const out: Skel[] = [];
+  const rects = nodeRects(spec, pos);
+
+  for (const n of spec.nodes) {
+    const r = rects.get(n.id);
+    if (!r) continue;
+    const s = styleFor(n.type);
     out.push({
       type: s.shape,
       id: n.id,
-      x: Math.round(p.cx - s.width / 2),
-      y: Math.round(p.cy - s.height / 2),
-      width: s.width,
-      height: s.height,
+      x: r.x,
+      y: r.y,
+      width: r.w,
+      height: r.h,
       backgroundColor: s.bg,
       strokeColor: s.stroke,
       label: { text: n.label },
     });
   }
+
   for (const e of spec.edges) {
-    const p = pos.get(e.from);
-    if (!p) continue;
+    const a = rects.get(e.from);
+    const b = rects.get(e.to);
+    if (!a || !b) continue;
+    const obstacles: Rect[] = [];
+    for (const [id, r] of rects) if (id !== e.from && id !== e.to) obstacles.push(r);
+    const path = routeConnector(a, b, obstacles);
+    const head = path[0];
     const skel: Skel = {
       type: "arrow",
-      x: Math.round(p.cx),
-      y: Math.round(p.cy),
+      x: Math.round(head.x),
+      y: Math.round(head.y),
       start: { id: e.from },
       end: { id: e.to },
+      points: path.map((p) => [Math.round(p.x - head.x), Math.round(p.y - head.y)]),
     };
     if (e.label) skel.label = { text: e.label };
     out.push(skel);
+  }
+  return out;
+}
+
+/** Caminho absoluto de cada aresta — usado nos testes geométricos. */
+export function edgePaths(spec: DiagramSpec, pos: Map<string, Pos>): Map<string, Point[]> {
+  const rects = nodeRects(spec, pos);
+  const out = new Map<string, Point[]>();
+  for (const e of spec.edges) {
+    const a = rects.get(e.from);
+    const b = rects.get(e.to);
+    if (!a || !b) continue;
+    const obstacles: Rect[] = [];
+    for (const [id, r] of rects) if (id !== e.from && id !== e.to) obstacles.push(r);
+    out.set(`${e.from}->${e.to}`, routeConnector(a, b, obstacles));
   }
   return out;
 }

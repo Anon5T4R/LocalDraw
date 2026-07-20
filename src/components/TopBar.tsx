@@ -6,6 +6,7 @@ import {
   type Locale,
   type MessageKey,
 } from "../lib/i18n";
+import { TEMPLATE_IDS, TEMPLATE_NAME_KEY, type TemplateId } from "../lib/templates";
 
 export type Theme =
   | "light"
@@ -42,7 +43,14 @@ interface Props {
   onExportSvg: () => void;
   onSetTheme: (theme: Theme) => void;
   onToggleAi: () => void;
+  onTemplate: (id: TemplateId) => void;
 }
+
+const TEMPLATE_ICON: Record<TemplateId, string> = {
+  flowchart: "▭",
+  org: "⌗",
+  network: "⁂",
+};
 
 const THEME_ICON: Record<Theme, string> = {
   light: "☀️",
@@ -90,6 +98,27 @@ export default function TopBar(p: Props) {
         <button onClick={p.onExportSvg} disabled={!p.canFiles} title={t("topbar.svgTitle")}>
           SVG
         </button>
+      </div>
+
+      <div className="group">
+        {/* Modelos prontos: `value=""` fixo — o select age como menu (dispara e
+            volta pro rótulo), não guarda estado. */}
+        <select
+          className="tpl-select"
+          value=""
+          onChange={(e) => {
+            if (e.target.value) p.onTemplate(e.target.value as TemplateId);
+          }}
+          title={t("tpl.title")}
+          aria-label={t("tpl.title")}
+        >
+          <option value="">{t("tpl.menu")}</option>
+          {TEMPLATE_IDS.map((id) => (
+            <option key={id} value={id}>
+              {TEMPLATE_ICON[id]} {t(TEMPLATE_NAME_KEY[id])}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="filename" title={p.fileName}>

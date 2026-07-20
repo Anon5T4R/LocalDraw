@@ -26,6 +26,7 @@ import {
 import { parseScene, serializeScene } from "./lib/tdraw";
 import { EXCAL_LANG, getLocale, t } from "./lib/i18n";
 import TopBar, { type Theme, THEMES } from "./components/TopBar";
+import type { TemplateId } from "./lib/templates";
 import AiPanel from "./components/AiPanel";
 import "./App.css";
 
@@ -311,6 +312,18 @@ export default function App() {
     [api],
   );
 
+  // Modelo pronto: mesmo caminho da IA (spec → layout → roteamento → elementos),
+  // só que o spec já vem escrito em `templates.ts`. Nenhuma rede envolvida.
+  const insertTemplate = useCallback(
+    async (id: TemplateId) => {
+      // O builder importa o Excalidraw; carrega sob demanda pra não pesar o boot.
+      const { buildDiagramElements } = await import("./lib/diagramBuild");
+      const { templateSpec } = await import("./lib/templates");
+      insertElements(buildDiagramElements(templateSpec(id)));
+    },
+    [insertElements],
+  );
+
   // Arquivo de abertura (duplo-clique / "abrir com") + encaminhamento do single-instance.
   useEffect(() => {
     if (!api || !canFiles) return;
@@ -382,6 +395,7 @@ export default function App() {
           saveTheme(th);
         }}
         onToggleAi={() => setAiOpen((v) => !v)}
+        onTemplate={insertTemplate}
       />
       <div className="excal-wrap">
         <Excalidraw
@@ -390,6 +404,9 @@ export default function App() {
           onChange={onChange}
           theme={canvasTheme}
           langCode={EXCAL_LANG[getLocale()]}
+          // OFFLINE: desliga os recursos de IA do próprio Excalidraw — eles falam
+          // com oss-ai.excalidraw.com. A IA do LocalDraw é a local (llama.cpp).
+          aiEnabled={false}
         >
           {/* Menu próprio: só itens offline. Remove os promos/online do padrão
               (Excalidraw+, redes sociais, colaboração ao vivo, login) e liga

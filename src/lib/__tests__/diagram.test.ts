@@ -142,6 +142,9 @@ describe("specToSkeleton", () => {
     expect(arrows[0].start).toEqual({ id: "a" });
     expect(arrows[0].end).toEqual({ id: "b" });
     expect(arrows[0].label).toEqual({ text: "talvez" });
+    // a seta agora carrega a polilinha roteada, relativa a x/y e começando em 0,0
+    expect(arrows[0].points!.length).toBeGreaterThanOrEqual(2);
+    expect(arrows[0].points![0]).toEqual([0, 0]);
     // a decisão vira losango
     const decision = containers.find((c) => c.id === "b")!;
     expect(decision.type).toBe("diamond");

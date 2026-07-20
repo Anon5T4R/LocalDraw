@@ -4,6 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LocalDraw</title>
+    <!-- LOCAL-FIRST, IMPOSTO PELO NAVEGADOR (não só por disciplina de código).
+         O bundle do Excalidraw traz URLs de serviços do excalidraw.com (biblioteca
+         online, publicar biblioteca, IA, colaboração, embeds do YouTube/Figma) e um
+         fallback de fontes no esm.sh. Em vez de confiar que nenhum caminho é
+         alcançável, esta CSP corta na raiz: só `self` e o llama.cpp local.
+         - connect-src: só a própria origem + 127.0.0.1/localhost (o servidor da IA
+           local) + o IPC do Tauri + o ws do HMR no dev;
+         - frame-src 'none': mata os embeds (YouTube/Vimeo/Figma/Reddit) do Excalidraw;
+         - 'unsafe-inline' em script-src é necessário pro script logo abaixo (e pros
+           inline do Vite em dev). A garantia de "não sai pacote" não depende dele —
+           depende de connect/img/font/frame-src. A CSP mora aqui e NÃO no
+           tauri.conf.json de propósito: lá o Tauri injeta nonce, e nonce presente
+           faz o navegador IGNORAR 'unsafe-inline', matando o script abaixo. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval';
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data: blob:;
+               font-src 'self' data:;
+               media-src 'self' data: blob:;
+               worker-src 'self' blob:;
+               child-src 'self' blob:;
+               connect-src 'self' data: blob: http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:* ipc: http://ipc.localhost asset: http://asset.localhost;
+               frame-src 'none';
+               object-src 'none';
+               base-uri 'self';
+               form-action 'none';"
+    />
     <!-- OFFLINE: aponta as fontes do Excalidraw pro caminho local servido pelo
          app (as fontes são copiadas pra /excalidraw-assets/fonts no build).
          Precisa rodar ANTES do módulo do Excalidraw carregar, por isso é inline

@@ -340,3 +340,28 @@ body {
   margin: 8px 0 0;
   word-break: break-word;
 }
+
+/* Modelos prontos: mesmo visual dos outros selects da barra. */
+.tpl-select {
+  font: inherit;
+  font-size: 13px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--bar-fg);
+}
+
+/* OFFLINE (parte visual do item "tirar links online"): a CSP já bloqueia os
+   requests, mas a UI do Excalidraw ainda MOSTRA os caminhos online — o link
+   "Bibliotecas" (libraries.excalidraw.com), o cabeçalho de links da ajuda
+   (docs/blog/GitHub) e a nota do diálogo de publicar biblioteca. Botão que não
+   funciona é pior que botão que não existe: some com eles.
+   O `:not(.excalidraw-hyperlinkContainer-link)` preserva o link que o PRÓPRIO
+   usuário anexa a uma forma — esse é conteúdo dele, não promoção nossa. */
+.excalidraw a[href^="http"]:not(.excalidraw-hyperlinkContainer-link),
+.excalidraw .library-menu-browse-button,
+.excalidraw .HelpDialog__header,
+.excalidraw .publish-library-note {
+  display: none !important;
+}
