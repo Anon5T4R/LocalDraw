@@ -1,6 +1,6 @@
 [package]
 name = "localdraw"
-version = "0.5.4"
+version = "0.5.5"
 description = "LocalDraw — diagramas e quadro-branco 100% offline, com IA local"
 authors = ["Taylor"]
 edition = "2021"
