@@ -37,7 +37,8 @@
         "ext": ["tdraw"],
         "name": "Diagrama LocalDraw",
         "description": "Diagrama/desenho do LocalDraw",
-        "role": "Editor"
+        "role": "Editor",
+        "mimeType": "application/x-taylor-tdraw"
       }
     ],
     "icon": [
