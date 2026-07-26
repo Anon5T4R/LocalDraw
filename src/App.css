@@ -16,6 +16,8 @@
      chrome) e no .ai-panel; aferido contra o pior caso, o bar-bg. */
   --hint: #666d7b;
   --error: #e03131;
+  /* <select> no Linux: sem isto o GTK pinta o texto com a cor dele. */
+  color-scheme: light;
 }
 
 .app[data-theme="dark"] {
@@ -29,6 +31,8 @@
   --panel-bg: #2a2c33;
   --hint: #9aa0aa;
   --error: #ff8787;
+  /* <select> no Linux: sem isto o GTK pinta o texto com a cor dele. */
+  color-scheme: dark;
 }
 
 /* Temas nomeados (paletas fixas). O chrome usa a paleta inteira; o canvas do
@@ -51,6 +55,8 @@
      no Draw é o panel-2 (mais escuro que o panel onde os outros apps o medem). */
   --hint: #5f6c5f;
   --error: #c0492f;
+  /* <select> no Linux: sem isto o GTK pinta o texto com a cor dele. */
+  color-scheme: light;
 }
 
 .app[data-theme="darkblue"] {
@@ -64,6 +70,8 @@
   --panel-bg: #1d2a3c;
   --hint: #8595ad;
   --error: #f87171;
+  /* <select> no Linux: sem isto o GTK pinta o texto com a cor dele. */
+  color-scheme: dark;
 }
 
 .app[data-theme="calmgreen"] {
@@ -77,6 +85,8 @@
   --panel-bg: #f7faf6;
   --hint: #5a6a5f;
   --error: #c0492f;
+  /* <select> no Linux: sem isto o GTK pinta o texto com a cor dele. */
+  color-scheme: light;
 }
 
 .app[data-theme="pastelpink"] {
@@ -90,6 +100,8 @@
   --panel-bg: #fdf6f9;
   --hint: #73606a;
   --error: #d84a6b;
+  /* <select> no Linux: sem isto o GTK pinta o texto com a cor dele. */
+  color-scheme: light;
 }
 
 .app[data-theme="punkprincess"] {
@@ -103,6 +115,8 @@
   --panel-bg: #251733;
   --hint: #9a86b5;
   --error: #ff5470;
+  /* <select> no Linux: sem isto o GTK pinta o texto com a cor dele. */
+  color-scheme: dark;
 }
 
 * {
