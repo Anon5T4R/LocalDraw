@@ -1913,6 +1913,7 @@ name = "localdraw"
 version = "0.5.8"
 dependencies = [
  "base64 0.22.1",
+ "gtk",
  "serde",
  "serde_json",
  "tauri",
